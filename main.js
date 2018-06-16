@@ -34,12 +34,14 @@ class Clicker {
   rank1() {
     if (this.pointTotal >= this.rank1Cost) {
       this.rank1Points++;
-			this.pointTotal -= this.rank1Cost;
-			this.showPoints();
+      this.pointTotal -= this.rank1Cost;
+      this.showPoints();
       this.rank1Cost = Math.ceil(this.rank1Cost * 1.1);
       if (this.rank1Points == 1) {
-				let self = this;
-        setInterval(function() {self.rank1Wrapper()}, 5000);
+        let self = this;
+        setInterval(function() {
+          self.rank1Wrapper();
+        }, 5000);
       }
     }
   }
@@ -52,12 +54,28 @@ class Clicker {
 //* load page
 
 onload = () => {
-  const clickGame = new Clicker();
-  clickGame.showPoints();
-  document.getElementById("clicker").addEventListener("click", function() {
-    clickGame.clickedEarn();
-  });
-  document.getElementById("autoclick").addEventListener("click", function() {
-    clickGame.rank1();
+	const master = {};
+	let test = "clickGame"
+	master[test] = new Clicker();
+	console.log(master);
+	master.clickGame.showPoints();
+	
+  document.getElementById("gamespace").addEventListener("click", function(e) {
+		if (e.srcElement.className == "addauto") {
+			let newEl = document.createElement("button").appendChild(document.createTextNode("New Autoclicker")).getRootNode();
+			newEl.id = Date.now();
+			newEl.className = "autoclick";
+			document.getElementById("special").appendChild(newEl);
+		}
+
+		// console.log(e.srcElement);
+    if (e.srcElement.id == "clicker") {
+			// console.log("clicked");
+      master.clickGame.clickedEarn();
+    }
+    if (e.srcElement.className == "autoclick") {
+			console.log(e.srcElement.id);
+      master.clickGame.rank1();
+    }
   });
 };
