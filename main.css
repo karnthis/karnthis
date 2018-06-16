@@ -1,0 +1,37 @@
+.main {
+	display: grid;
+	grid-template-rows: 25vh repeat(3, 10vh);
+	grid-template-columns: repeat(3, 10vw);
+	grid-template-areas:
+		"heading heading heading";
+}
+
+.special {
+	grid-area: heading;
+	justify-self: stretch;
+}
+
+.child {
+	border: 2px;
+	border-style: solid;
+	justify-self: stretch;
+
+	display: grid;
+	grid-template-rows: 75% 25%;
+	grid-template-columns: 33% 34% 33%);
+	grid-template-areas:
+		"label label label";
+
+}
+
+.meh {
+	grid-area: label;
+	justify-self: stretch;
+}
+
+.bah {
+	border: 2px;
+	border-style: solid;
+	justify-self: stretch;
+
+}
