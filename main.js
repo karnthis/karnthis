@@ -1,25 +1,56 @@
-class AutoClicker {
-  constructor(mod) {
-    this.price = Math.ceil(20 * mod.price);
-		this.payout = Math.floor(1 * mod.payout);
-		this.time = Math.ceil(1 * mod.time) * 1000;
-		this.count = 0;
-		this.running = false;
+class Clickers {
+	//* shared functions
+	updateScore(moarPoints) {
+		Clicker.score += moarPoints;
+		
+	}
+}
+
+class SelfClicker extends Clickers {
+	constructor() {
+		currentPoints
+		totalPoints
+		totalClicks
+		
+	}
+}
+
+class AutoClicker extends Clickers {
+  constructor(mod, resume) {
+		if (!resume) resume = {};
+		super();
+		this.price = resume.price || Math.ceil(20 * mod.price);
+		this.payout = resume.payout || Math.floor(1 * mod.payout);
+		this.time = resume.time || Math.ceil(1 * mod.time) * 1000;
+		this.count = resume.count || 0;
+		this.running = resume.running || false;
 		this.points = document.getElementById("points").firstChild;
   }
 
-  static updateRates() {
-    if (!AutoClicker.modifiers) {
+	static setRates(startMods) {
+		if (!startMods) {
 			AutoClicker.modifiers = {};
 			AutoClicker.modifiers.price = 1;
 			AutoClicker.modifiers.payout = 1;
 			AutoClicker.modifiers.time = 1;
 		}
 		else {
+			AutoClicker.modifiers = startMods;
+		}
+	}
+
+  static updateRates() {
       AutoClicker.modifiers.price *= 1.6;
 			AutoClicker.modifiers.payout *= 2.2;
 			AutoClicker.modifiers.time *= 1.5;
-    }
+	}
+
+	startClicker() {
+		let self = this;
+		self.running = true;
+		setInterval(function() {
+			self.points.nodeValue = parseInt(self.points.nodeValue) + (self.payout * self.count);
+		}, self.time);
 	}
 	
 	buyClicker() {
@@ -32,11 +63,7 @@ class AutoClicker {
 			this.count++;
 			this.price = Math.ceil(this.price *1.25);
 			if (!this.running) {
-				this.running = true;
-        let self = this;
-        setInterval(function() {
-          self.points.nodeValue = parseInt(self.points.nodeValue) + (self.payout * self.count);
-        }, self.time);
+        this.startClicker();
       }
 		}
 	}
@@ -50,7 +77,10 @@ class AutoClicker {
 		if (workingPoints >= workingCost) {
 			this.points.nodeValue = workingPoints - workingCost;
 			this.count += 10;
-			this.price = Math.ceil(this.price * (1 + .25) ** 11);			
+			this.price = Math.ceil(this.price * (1 + .25) ** 11);
+			if (!this.running) {
+        this.startClicker();
+      }			
 		}
 	}
 
@@ -66,50 +96,44 @@ class AutoClicker {
 			this.points.nodeValue = workingPoints - workingCost;
 			this.count += 10;
 			this.price = Math.ceil(this.price * (1 + .25) ** 11);
+			if (!this.running) {
+        this.startClicker();
+      }
 		}
 	}
 }
 
 
-const buildEl = (bit1, bit2) => {
-  let working = document
-    .createElement("div")
-    .appendChild(document.createTextNode(bit2))
-    .getRootNode();
-  working.className = bit1;
-  return working;
-};
+
 
 //* load page
 
 onload = () => {
-  const master = {};
-	AutoClicker.updateRates();
+	const master = {};
+	const rebuild = JSON.parse(localStorage.getItem("clickers")) || {};
+	AutoClicker.setRates();
+	//document.getElementById('temp').innerHTML = localStorage.getItem("clickers");
+	//* build playing field
+	populateField(rebuild, master)
+	
+	//* autosave
+	// setInterval(function() {
+	// 	localStorage.setItem("clickers", master)
+	// }, 5000);
 
   document.getElementById("gamespace").addEventListener("click", function(e) {
-    //* set up working vars
+	 
+		//* set up working vars
     let workingid = e.srcElement.parentElement.id;
     let clickedclass = e.srcElement.className;
 
     if (clickedclass == "addauto") {
-      let d = document;
-      let newEl = document
-        .createElement("div")
-        .appendChild(buildEl("meh", "testing"))
-        .getRootNode()
-        .appendChild(buildEl("bah buyClicker", "buy 1 clicker"))
-        .getRootNode()
-        .appendChild(buildEl("bah buy10Clickers", "buy 10 clickers"))
-        .getRootNode()
-        .appendChild(buildEl("bah buyMaxClickers", "disabled"))
-				.getRootNode();
-				
-      newEl.id = Date.now();
-      newEl.className = "child";
-      document.getElementById("gamespace").appendChild(newEl);
-
-			master[newEl.id] = new AutoClicker(AutoClicker.modifiers);
+			let id = Date.now();
+			document.getElementById("gamespace").appendChild(buildClicker(id));
+			console.log(id);
+			master[id] = new AutoClicker(AutoClicker.modifiers);
 			AutoClicker.updateRates();
+			console.log(master);
     }
 
     if (clickedclass == "clicker") {
@@ -118,10 +142,54 @@ onload = () => {
     }
     
 		if (clickedclass.indexOf("buyClicker") >= 0) {
+			console.log(workingid)
       master[workingid].buyClicker();
 		}
 		if (clickedclass.indexOf("buy10Clickers") >= 0) {
       master[workingid].buyClickers();
 		}
+		if (clickedclass.indexOf("test") >= 0) {
+			saveData(master)
+		}
   });
+};
+
+//* functions
+
+const saveData = (data) => {
+	localStorage.setItem("clickers", JSON.stringify(data))
+}
+
+const buildChild = (bit1, bit2) => {
+  let working = document
+    .createElement("div")
+    .appendChild(document.createTextNode(bit2))
+    .getRootNode();
+  working.className = bit1;
+  return working;
+};
+
+const buildClicker = (elId) => {
+	let newEl = document
+		.createElement("div")
+		.appendChild(buildChild("meh", "testing"))
+		.getRootNode()
+		.appendChild(buildChild("bah buyClicker", "buy 1 clicker"))
+		.getRootNode()
+		.appendChild(buildChild("bah buy10Clickers", "buy 10 clickers"))
+		.getRootNode()
+		.appendChild(buildChild("bah buyMaxClickers", "disabled"))
+		.getRootNode();
+	newEl.id = elId;
+	newEl.className = "child";
+	return newEl;
+};
+
+const populateField = (allClickers, masterRef) => {
+	Object.keys(allClickers).forEach((key) => {
+		console.log(allClickers)
+		console.log(allClickers[key])
+		document.getElementById("gamespace").appendChild(buildClicker(key));
+		masterRef[key] = new AutoClicker(AutoClicker.modifiers, allClickers[key]);
+	})
 };
