@@ -109,6 +109,8 @@ class AutoClicker extends Clickers {
 //* load page
 
 onload = () => {
+	console.log("width",window.innerWidth)
+	console.log("height",window.innerHeight)
 	const master = {};
 	const rebuild = JSON.parse(localStorage.getItem("clickers")) || {};
 	AutoClicker.setRates();

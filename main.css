@@ -1,24 +1,44 @@
-.main {
-	display: grid;
-	grid-template-rows: 25vh repeat(3, 20vh);
-	grid-template-columns: repeat(3, 30vw);
-	grid-template-areas:
-		"heading heading heading";
+*{
+  /* box-sizing: border-box; */
+  padding: 0;
+  margin: 0;
 }
 
-.special {
-	grid-area: heading;
-	justify-self: stretch;
+.container {
+	display: grid;
+	grid-template-columns: 1fr 1500px 1fr;
+	grid-template-areas:
+		". playfield .";
+}
+
+.main {
+	grid-area: playfield;
+	display: grid;
+	grid-template-rows: repeat(30, 150px);
+	grid-template-columns: repeat(10, 150px);
+	grid-template-areas:
+		"clicker clicker"
+		"clicker clicker";
+	border: 2px;
+	border-style: solid;
+	/* justify-self: stretch; */
+	height: 100vh;
+}
+
+#special {
+	grid-area: clicker;
+	/* justify-self: stretch; */
+	background-color: darkolivegreen;
 }
 
 .child {
 	border: 2px;
 	border-style: solid;
-	justify-self: stretch;
+	/* justify-self: stretch; */
 
 	display: grid;
-	grid-template-rows: 75% 25%;
-	grid-template-columns: 33% 34% 33%);
+	grid-template-rows: 33% 34% 33%;
+	grid-template-columns: 75% 25%;
 	grid-template-areas:
 		"label label label";
 
@@ -26,12 +46,64 @@
 
 .meh {
 	grid-area: label;
-	justify-self: stretch;
+	/* justify-self: stretch; */
 }
 
 .bah {
 	border: 2px;
 	border-style: solid;
-	justify-self: stretch;
+	/* justify-self: stretch; */
 
+}
+
+@media screen and (max-width: 1510px) {
+  .container {
+    grid-template-columns: 1fr 1200px 1fr;
+	}
+	.main {
+		grid-template-columns: repeat(8, 150px);
+	}
+}
+
+@media screen and (max-width: 1210px) {
+  .container {
+    grid-template-columns: 1fr 900px 1fr;
+	}
+	.main {
+		grid-template-columns: repeat(6, 150px);
+	}
+}
+
+@media screen and (max-width: 910px) {
+  .container {
+    grid-template-columns: 1fr 600px 1fr;
+	}
+	.main {
+		grid-template-rows: repeat(30, 100px);
+		grid-template-columns: repeat(6, 100px);
+	}
+}
+
+@media screen and (max-width: 610px) {
+  .container {
+    grid-template-columns: 1fr 300px 1fr;
+	}
+	.main {
+		/* grid-template-rows: repeat(30, 100px); */
+		grid-template-columns: repeat(3, 100px);
+		grid-template-areas:
+		"clicker";
+	}
+}
+
+@media screen and (max-width: 310px) {
+  .container {
+    grid-template-columns: 1fr 150px 1fr;
+	}
+	.main {
+		/* grid-template-rows: repeat(30, 100px); */
+		grid-template-columns: 150px;
+		/* grid-template-areas: */
+		/* "clicker"; */
+	}
 }
