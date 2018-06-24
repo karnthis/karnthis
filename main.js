@@ -1,20 +1,19 @@
 class ClickerFunctions {
 
-	// constructor(resume) {
-	// 	if (!resume) resume = {};
-	// 	super();
-	// 	this.emojis = resume.emojis || [];
-  //   this.currentPoints = resume || 0;
-  //   this.totalPoints = resume || 0;
-  //   this.totalClicks = resume || 0;
-  // }
-
-  //* shared functions
+	constructor() {
+		this.revealAutoclicker = new Event("build");
+  }
+	
+	
+	//* shared functions
   updateScore(moarPoints) {
 		this.currentPoints += moarPoints;
 		this.totalPoints =+ moarPoints;
+		if (this.currentPoints >= this.modifiers.autoPrice / 2) {
+			document.dispatchEvent(this.revealAutoclicker);
+		}
 		// console.log(this)
-		document.getElementById("points").firstChild.nodeValue = this.currentPoints;
+		document.getElementById("points").innerHTML = this.currentPoints;
   }
 }
 
@@ -28,6 +27,7 @@ class SelfClicker extends ClickerFunctions {
     this.currentPoints = resume.currentPoints || 0;
     this.totalPoints = resume.totalPoints || 0;
 		this.totalClicks = resume.totalClicks || 0;
+		this.clickModifier = resume.clickModifier || 1;
 		this.modifiers.autoPrice = resume.modifiers.autoPrice || 1;
 		this.modifiers.autoPayout = resume.modifiers.autoPayout || 1;
 		this.modifiers.autoTime = resume.modifiers.autoTime || 1;
@@ -48,7 +48,12 @@ class SelfClicker extends ClickerFunctions {
     this.modifiers.autoPrice *= 1.6;
     this.modifiers.autoPayout *= 2.2;
     this.modifiers.autoTime *= 1.5;
-  }
+	}
+	
+	clicked() {
+		this.totalClicks += 1;
+		super.updateScore(1 * this.clickModifier)
+	}
 }
 
 class AutoClicker extends ClickerFunctions {
@@ -153,6 +158,7 @@ onload = () => {
 	if (!master.test) {
 		master.test = new SelfClicker();
 	}
+	document.getElementById("points").innerHTML = master.test.currentPoints;
 	// master.test = new SelfClicker();
 	// console.log(master.tracker);
 
@@ -161,13 +167,20 @@ onload = () => {
   // 	localStorage.setItem("clickers", master)
   // }, 5000);
 
-  document.getElementById("gamespace").addEventListener("click", function(e) {
+	//* events
+	// const revealAutoclicker = new Event("build");
+
+	document.addEventListener("build", (e) => {
+		console.log("triggered")
+	})
+
+  document.getElementById("gamespace").addEventListener("click", (e) => {
     //* set up working vars
     let workingid = e.target.parentElement.id;
     let clickedclass = e.target.className;
 
 		if (clickedclass == "clicker") {
-			master.test.updateScore(1);
+			master.test.clicked();
       // let pointnode = document.getElementById("points").firstChild;
       // pointnode.nodeValue = parseInt(pointnode.nodeValue) + 1;
     }
